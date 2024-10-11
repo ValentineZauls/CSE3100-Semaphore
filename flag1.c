@@ -17,16 +17,23 @@ int main()
     // truncate the file to one page
     ftruncate(md, 4096);
     int *t = mmap(NULL, 4096, PROT_READ | PROT_WRITE, MAP_SHARED, md, 0);
-    sem_t *s = sem_open("/sema2", O_CREAT, 0666, 1);
+    sem_t *s = sem_open("/sema2", O_CREAT, 0666, 1); // semaphore is 1
     if (s == SEM_FAILED)
     {
         printf("Semaphore failed to open: %s\n", strerror(errno));
         exit(1);
     }
     memset(t, 0, 4096);
+    //int err;
     for (int i = 0; i < 1000000000; i++)
     {
         sem_wait(s); // program hangs here
+        // int err = sem_trywait(s);
+        // if (err == -1)
+        // {
+        //     printf("Semaphore failed to open: %s\n", strerror(errno));
+        //     exit(1);
+        // }
         t[0] = t[0] + 1;
         sem_post(s);
     }
